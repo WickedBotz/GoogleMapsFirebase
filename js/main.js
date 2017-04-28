@@ -18,7 +18,7 @@ var map = new google.maps.Map(document.getElementById('map'), {
 
 // Listen for clicks and add the location of the click to firebase.
 map.addListener('click', function(e) {
-  console.log(`click => lat: ${e.latLng.lat()} lng: ${e.latLng.lng()}`);
+  console.log(`click => lat,lng->: ${e.latLng.lat()}f,    ${e.latLng.lng()}f`);
   data.lat = e.latLng.lat();
   data.lng = e.latLng.lng();
   addMarker(data);
