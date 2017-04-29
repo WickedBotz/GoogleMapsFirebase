@@ -8,10 +8,12 @@ var data = {
 };
 
 var markers = [];
+var wickedBotzLocation = {lat: -26.4665992733309, lng: -49.11446034908295};
+
 
 var map = new google.maps.Map(document.getElementById('map'), {
   zoom: 18,
-  center: new google.maps.LatLng(-26.4672725,-49.117096,15),
+  center: new google.maps.LatLng(-26.4665992733309,-49.11446034908295),
   mapTypeId: google.maps.MapTypeId.HYBRID
 });
 
@@ -23,6 +25,40 @@ map.addListener('click', function(e) {
   data.lng = e.latLng.lng();
   addMarker(data);
 });
+
+// Resize stuff...
+google.maps.event.addDomListener(window, "resize", function() {
+   var center = map.getCenter();
+   console.log("screen size changed");
+   google.maps.event.trigger(map, "resize");
+   map.setCenter(center);
+});
+
+var icon = {
+    url: "img/wickedBotzP.png", // url
+    scaledSize: new google.maps.Size(40, 40), // scaled size
+    origin: new google.maps.Point(0,0), // origin
+    anchor: new google.maps.Point(0, 0) // anchor
+};
+var markerWickedBotz= new google.maps.Marker({
+            position: wickedBotzLocation,
+            icon: icon,
+            map: map,
+            title: 'WickedBotz'
+});
+var contentString = "";
+$.get( "partials/infoWickedBotz.html", function( data ) {
+   contentString = data;
+}).done(function() {
+  let infoWickedBotzMarker = new google.maps.InfoWindow({
+    content: contentString
+  });
+
+  markerWickedBotz.addListener('click', function() {
+     infoWickedBotzMarker.open(map, markerWickedBotz);
+   });
+});
+
 
 function getTimestamp(addClick) {
   // Reference to location for saving the last click time.
@@ -53,14 +89,16 @@ function addMarker(data) {
 firebase.database().ref('clicks').on('value', function (snapshot) {
   console.log("banco mudou");
   clearMarkers();
+  var i = 0;
   snapshot.forEach(function (item) {
-    var marker = new google.maps.Marker({
-      position: new google.maps.LatLng(item.val().lat, item.val().lng),
-      map: map
-    });
-    markers.push(marker);
+    setTimeout(function() {
+        addMarkerManual(item.val().lat, item.val().lng);
+    }, i * 200);
+    i++;
   });
 });
+
+
 
 // Sets the map on all markers in the array.
 function setMapOnAll(map) {
@@ -83,4 +121,31 @@ function showMarkers() {
 function deleteMarkers() {
   clearMarkers();
   markers = [];
+  return firebase.database().ref().child('clicks').remove();
+}
+
+function addMarkerManual(lat,lng){
+  var marker = new google.maps.Marker({
+    position: new google.maps.LatLng(lat,lng),
+    map: map,
+    draggable: true,
+    animation:google.maps.Animation.DROP
+  });
+  marker.addListener('click', toggleBounce);
+  markers.push(marker);
+}
+function toggleBounce() {
+  if (marker.getAnimation() !== null) {
+    marker.setAnimation(null);
+  } else {
+    marker.setAnimation(google.maps.Animation.BOUNCE);
+  }
+}
+
+function drop() {
+  for (var i =0; i < markerArray.length; i++) {
+    setTimeout(function() {
+      addMarkerMethod();
+    }, i * 200);
+  }
 }
