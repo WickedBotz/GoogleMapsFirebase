@@ -28,35 +28,35 @@ map.addListener('click', function(e) {
 
 // Resize stuff...
 google.maps.event.addDomListener(window, "resize", function() {
-   var center = map.getCenter();
-   console.log("screen size changed");
-   google.maps.event.trigger(map, "resize");
-   map.setCenter(center);
+  var center = map.getCenter();
+  console.log("screen size changed");
+  google.maps.event.trigger(map, "resize");
+  map.setCenter(center);
 });
 
 var icon = {
-    url: "img/wickedBotzP.png", // url
-    scaledSize: new google.maps.Size(40, 40), // scaled size
-    origin: new google.maps.Point(0,0), // origin
-    anchor: new google.maps.Point(0, 0) // anchor
+  url: "img/wickedBotzP.png", // url
+  scaledSize: new google.maps.Size(40, 40), // scaled size
+  origin: new google.maps.Point(0,0), // origin
+  anchor: new google.maps.Point(0, 0) // anchor
 };
 var markerWickedBotz= new google.maps.Marker({
-            position: wickedBotzLocation,
-            icon: icon,
-            map: map,
-            title: 'WickedBotz'
+  position: wickedBotzLocation,
+  icon: icon,
+  map: map,
+  title: 'WickedBotz'
 });
 var contentString = "";
 $.get( "partials/infoWickedBotz.html", function( data ) {
-   contentString = data;
+  contentString = data;
 }).done(function() {
   let infoWickedBotzMarker = new google.maps.InfoWindow({
     content: contentString
   });
 
   markerWickedBotz.addListener('click', function() {
-     infoWickedBotzMarker.open(map, markerWickedBotz);
-   });
+    infoWickedBotzMarker.open(map, markerWickedBotz);
+  });
 });
 
 
@@ -86,16 +86,31 @@ function addMarker(data) {
 }
 
 //Listen database changes
-firebase.database().ref('clicks').on('value', function (snapshot) {
-  console.log("banco mudou");
-  clearMarkers();
+firebase.database().ref('clicks').once('value', function(snapshot){
+  console.log("carreguei a primeira vez");
   var i = 0;
+  console.log(snapshot);
   snapshot.forEach(function (item) {
+    console.log("to no for dos novos:");
+    console.log(item.val());
     setTimeout(function() {
-        addMarkerManual(item.val().lat, item.val().lng);
+      addMarkerManual(item.val().lat, item.val().lng);
     }, i * 200);
     i++;
   });
+});
+
+firebase.database().ref('clicks').on('child_added', function(snapshot) {
+  console.log("ponto novo adicionado");
+  console.log(snapshot.val());
+  addMarkerManual(snapshot.val().lat, snapshot.val().lng);
+});
+
+firebase.database().ref('clicks').once('child_removed', function(snapshot) {
+  console.log("ponto removido");
+  // console.log(snapshot.val());
+  clearMarkers();
+  markers = [];
 });
 
 
@@ -131,21 +146,5 @@ function addMarkerManual(lat,lng){
     draggable: true,
     animation:google.maps.Animation.DROP
   });
-  marker.addListener('click', toggleBounce);
   markers.push(marker);
-}
-function toggleBounce() {
-  if (marker.getAnimation() !== null) {
-    marker.setAnimation(null);
-  } else {
-    marker.setAnimation(google.maps.Animation.BOUNCE);
-  }
-}
-
-function drop() {
-  for (var i =0; i < markerArray.length; i++) {
-    setTimeout(function() {
-      addMarkerMethod();
-    }, i * 200);
-  }
 }

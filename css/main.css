@@ -8,3 +8,14 @@ html, body {
   height: 100%;
   margin: 0;
 }
+
+#floating-panel {
+       position: absolute;
+       bottom:  30px;
+       right: : 20%;
+       z-index: 5;
+       padding: 5px;
+       text-align: center;
+       font-family: 'Roboto','sans-serif';
+       line-height: 30px;
+     }
