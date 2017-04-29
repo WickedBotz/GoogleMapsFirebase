@@ -106,7 +106,7 @@ firebase.database().ref('clicks').on('child_added', function(snapshot) {
   addMarkerManual(snapshot.val().lat, snapshot.val().lng);
 });
 
-firebase.database().ref('clicks').once('child_removed', function(snapshot) {
+firebase.database().ref('clicks').on('child_removed', function(snapshot) {
   console.log("ponto removido");
   // console.log(snapshot.val());
   clearMarkers();
