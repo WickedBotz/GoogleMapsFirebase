@@ -20,6 +20,6 @@ html, body {
        line-height: 30px;
      }
 
-#map {
+* {
   cursor: crosshair !important;
 }
