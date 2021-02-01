@@ -85,20 +85,20 @@ function addMarker(data) {
   return firebase.database().ref().child('clicks').push(data);
 }
 
-//Listen database changes
-//firebase.database().ref('clicks').once('value', function(snapshot){
-//  console.log("carreguei a primeira vez");
-//  var i = 0;
-//  console.log(snapshot);
-//  snapshot.forEach(function (item) {
-//    console.log("to no for dos novos:");
-//    console.log(item.val());
-//    setTimeout(function() {
-//      addMarkerManual(item.val().lat, item.val().lng);
-//    }, i * 200);
-//    i++;
-//  });
-//});
+// Listen database changes
+firebase.database().ref('clicks').once('value', function(snapshot){
+ console.log("carreguei a primeira vez");
+ var i = 0;
+ console.log(snapshot);
+ snapshot.forEach(function (item) {
+   console.log("to no for dos novos:");
+   console.log(item.val());
+   setTimeout(function() {
+     addMarkerManual(item.val().lat, item.val().lng);
+   }, i * 200);
+   i++;
+ });
+});
 
 firebase.database().ref('clicks').on('child_added', function(snapshot) {
   console.log("ponto novo adicionado");
